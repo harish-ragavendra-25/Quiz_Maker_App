@@ -20,6 +20,10 @@ const FacultySchema = new mongoose.Schema({
       ref: "courseMappingModel",
     },
   ],
+  role: {
+    type: String,
+    default: 'faculty'
+  }
 });
 
 const facultyModel = new mongoose.model("facultyModel", FacultySchema);

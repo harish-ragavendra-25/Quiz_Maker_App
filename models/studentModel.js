@@ -20,6 +20,10 @@ const studentSchema = new mongoose.Schema({
       ref: "courseMappingModel",
     },
   ],
+  role: {
+    type: String,
+    default: 'student'
+  }
 });
 
 const studentModel = mongoose.model("studentModel", studentSchema);
