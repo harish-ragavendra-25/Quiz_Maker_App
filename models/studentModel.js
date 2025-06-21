@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const bcrypt = require('bcryptjs');
+const saltNum = parseInt(process.env.saltNum);
 
 const studentSchema = new mongoose.Schema({
   userName: {
@@ -25,6 +27,16 @@ const studentSchema = new mongoose.Schema({
     default: 'student'
   }
 });
+
+studentSchema.pre('save',async function(next){
+  try {
+    if(this.isModified('password')){
+      this.password = await bcrypt.hash(this.password,saltNum);
+    }
+  } catch (error) {
+    next(error);
+  }
+})
 
 const studentModel = mongoose.model("studentModel", studentSchema);
 module.exports = studentModel;

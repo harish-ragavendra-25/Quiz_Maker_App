@@ -36,7 +36,7 @@ const adminLogin = async(req,res) => {
         const { userName,password } = req.body;
 
         if(!userName||!password){
-            res.status(400).json({message: 'All fields are required!!'});
+            return res.status(400).json({message: 'All fields are required!!'});
         }
 
         const user = await adminModel.findOne({userName});
@@ -55,7 +55,7 @@ const adminLogin = async(req,res) => {
 
         // token sign
         const token = jwt.sign(
-            {id:user._id},
+            {id:user._id,role:user.role},
             JWT_SECRET,
             {expiresIn:'1d'}
         );
@@ -72,8 +72,12 @@ const adminLogin = async(req,res) => {
     } catch (error) {
         console.log("......................adminAuthController(adminLogin).......................");
         console.log(error);
-        res.status(500).json({message: "Something went wrong"});
+        return res.status(500).json({message: "Something went wrong"});
     }
 }
 
-module.exports = {adminRegister,adminLogin};
+const adminTest = (req,res) => {
+    return res.status(200).json({message: "Admin route enters after the verify token and verify admin middleware"});
+}
+
+module.exports = {adminRegister,adminLogin,adminTest};
