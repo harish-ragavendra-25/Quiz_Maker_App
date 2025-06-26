@@ -4,6 +4,7 @@ const courseModel = require('../models/courseModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const facultyModel = require('../models/faculyModel');
+const studentModel = require('../models/studentModel');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const saltNum = parseInt(process.env.saltNum);
@@ -131,7 +132,7 @@ const addCourse = async(req,res) => {
         const newCourse = new courseModel({courseCode,courseName,description});
         await newCourse.save();
 
-        return res.status(201).json({message: "Course created Successfully...",course: newCourse});
+        return res.status(201).json({message: `${courseCode} - ${courseName} created Successfully...`,course: newCourse});
     } catch (error) {
         console.log("Error in creating Course");
         return res.status(500).json({ message: 'Something went wrong...'});
@@ -147,13 +148,13 @@ const addFaculty = async(req,res) => {
 
         const isExist = await facultyModel.findOne({ userName });
         if(isExist){
-            return res.status(400).json({ message: 'Faculty Already Exist...'});
+            return res.status(400).json({ message: `Faculty with userName: ${userName} already Exist...`});
         }
 
         const newFaculty = new facultyModel({ userName,password });
         await newFaculty.save();
 
-        return res.status(201).json({message: "Faculty Created Successfully...",faculty: newFaculty});
+        return res.status(201).json({message: `Faculty ${userName} Created Successfully...`,faculty: newFaculty});
     } catch (error) {
         console.log("Faculty creation error(Admin controller -> Add Faculty Function)");
         console.log(error);
@@ -161,5 +162,33 @@ const addFaculty = async(req,res) => {
     }
 }
 
+const addStudent = async(req,res) => {
+    try {
+        const { userName,password } = req.body;
+        
+        if(!userName || !password){
+            return res.status(400).json({message: "UserName and Password Fields are required..."});
+        }
 
-module.exports = {adminRegister,adminLogin,adminCredentialsUpdate,addCourse,addFaculty};
+        const isExist = await studentModel.findOne({ userName });
+        if(isExist){
+            return res.status(400).json({message: `Student with userName: ${userName} already Exist...`});
+        }
+
+        const newStudent = new studentModel({ userName,password });
+        await newStudent.save();
+        return res.status(201).json({message: `Student ${userName} created Sucessfully`,student: newStudent});
+    } catch (error) {
+        console.log("Student Creation function (Admin Controller -> addStudent)");
+        console.log(error);
+        return res.status(500).json({message: "Something went wrong..."});
+    }
+}
+module.exports = {
+    adminRegister,
+    adminLogin,
+    adminCredentialsUpdate,
+    addCourse,
+    addFaculty,
+    addStudent
+};
