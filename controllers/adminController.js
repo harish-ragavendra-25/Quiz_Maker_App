@@ -3,6 +3,7 @@ const courseModel = require('../models/courseModel');
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const facultyModel = require('../models/faculyModel');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const saltNum = parseInt(process.env.saltNum);
@@ -132,13 +133,33 @@ const addCourse = async(req,res) => {
 
         return res.status(201).json({message: "Course created Successfully...",course: newCourse});
     } catch (error) {
-        const existing = await courseModel.findOne({ $or: [{ courseName }, { courseCode }] });
-    if (existing) {
         console.log("Error in creating Course");
         return res.status(500).json({ message: 'Something went wrong...'});
     }
+}
+
+const addFaculty = async(req,res) => {
+    try {
+        const { userName,password } = req.body;
+        if(!userName || !password) {
+            return res.status(400).json({message: "UserName and Password Fields are required...!!"});
+        } 
+
+        const isExist = await facultyModel.findOne({ userName });
+        if(isExist){
+            return res.status(400).json({ message: 'Faculty Already Exist...'});
+        }
+
+        const newFaculty = new facultyModel({ userName,password });
+        await newFaculty.save();
+
+        return res.status(201).json({message: "Faculty Created Successfully...",faculty: newFaculty});
+    } catch (error) {
+        console.log("Faculty creation error(Admin controller -> Add Faculty Function)");
+        console.log(error);
+        return res.status(500).json({message: "Something went wrong..."});
     }
 }
 
 
-module.exports = {adminRegister,adminLogin,adminCredentialsUpdate,addCourse};
+module.exports = {adminRegister,adminLogin,adminCredentialsUpdate,addCourse,addFaculty};

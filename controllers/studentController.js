@@ -6,11 +6,11 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const studentRegister = async(req,res) => {
     try {
         const { userName,password } = req.body;
-        
+
         if(!userName || !password){
             return res.status(400).json({message:"Ensure all fields are filled"});
         }
-
+        
         const existingUser = await studentModel.findOne({ userName });
         if(existingUser){
             return res.status(400).json({message: "user already exist!!"});
@@ -113,6 +113,5 @@ const studentCredentialsUpdate = async(req,res) => {
         return res.status(500).json({message: 'Something went wrong...'});
     }
 }
-
 
 module.exports = {studentRegister,studentLogin,studentCredentialsUpdate};
