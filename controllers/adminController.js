@@ -1,6 +1,9 @@
 const adminModel = require('../models/adminModel');
+const courseModel = require('../models/courseModel');
+
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+
 const JWT_SECRET = process.env.JWT_SECRET;
 const saltNum = parseInt(process.env.saltNum);
 
@@ -111,4 +114,31 @@ const adminCredentialsUpdate = async(req,res) => {
     }
 }
 
-module.exports = {adminRegister,adminLogin,adminCredentialsUpdate};
+const addCourse = async(req,res) => {
+    try {
+        const { courseCode,courseName,description } = req.body;
+
+        if(!courseCode || !courseName){
+            return res.status(400).json({message: "Course Code and Course Name is requried..."});
+        }
+
+        const existing = await courseModel.findOne({ $or: [ {courseCode} , {courseName} ]});
+        if(existing){
+            return res.status(400).json({message: 'Course with the same Name or Code already exists...'});
+        }
+
+        const newCourse = new courseModel({courseCode,courseName,description});
+        await newCourse.save();
+
+        return res.status(201).json({message: "Course created Successfully...",course: newCourse});
+    } catch (error) {
+        const existing = await courseModel.findOne({ $or: [{ courseName }, { courseCode }] });
+    if (existing) {
+        console.log("Error in creating Course");
+        return res.status(500).json({ message: 'Something went wrong...'});
+    }
+    }
+}
+
+
+module.exports = {adminRegister,adminLogin,adminCredentialsUpdate,addCourse};
