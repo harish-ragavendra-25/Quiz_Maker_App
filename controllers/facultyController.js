@@ -76,8 +76,41 @@ const facultyLogin = async(req,res) => {
     }
 }
 
-const facultyTest = (req,res) => {
-    return  res.status(200).json({message: "faculty test reached after passing the verifyToken and the verifyFaculty middleware..."})
+const facultyCredentialsUpdate = async(req,res) => {
+    try {
+
+        const logged_faculty_id = req.user.id;
+        const { newUserName,newPassword,oldPassword } = req.body;
+
+        if(!oldPassword){
+            return res.status(400).json({message: "Old Password required..."});
+        }
+
+        const logged_faculty = await facultyModel.findById(logged_faculty_id);
+
+        if(!logged_faculty){
+            return res.status(404).json({message: "Faculty not found..."});
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword,logged_faculty.password);
+
+        if(!isMatch){
+            return res.status(401).json({message: "Old Password Incorrect..."});
+        }
+
+        if(newUserName){
+            logged_faculty.userName = newUserName;
+        }
+        if(newPassword){
+            logged_faculty.password = newPassword;
+        }
+        await logged_faculty.save();
+        return res.status(200).json({message: "Updated the faculty details..."});
+    } catch (error) {
+        console.log("Faculty credentials updation(facutly-Controller)...");
+        console.log(error);
+        return res.status(500).json({message: 'Something went wrong...'});
+    }
 }
 
-module.exports = {facultyRegister,facultyLogin,facultyTest};
+module.exports = {facultyRegister,facultyLogin,facultyCredentialsUpdate};

@@ -77,8 +77,42 @@ const studentLogin = async(req,res) => {
     }
 }
 
-const studentTest = (req,res) => {
-    return  res.status(200).json({message: "student test reached after passing the verifyToken and the verifyStudent middleware..."})
+const studentCredentialsUpdate = async(req,res) => {
+    try {
+
+        const logged_student_id = req.user.id;
+        const { newUserName,newPassword,oldPassword } = req.body;
+
+        if(!oldPassword){
+            return res.status(400).json({message: "Old Password required..."});
+        }
+
+        const logged_student = await studentModel.findById(logged_student_id);
+
+        if(!logged_student){
+            return res.status(404).json({message: "Student not found..."});
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword,logged_student.password);
+
+        if(!isMatch){
+            return res.status(401).json({message: "Old Password Incorrect..."});
+        }
+
+        if(newUserName){
+            logged_student.userName = newUserName;
+        }
+        if(newPassword){
+            logged_student.password = newPassword;
+        }
+        await logged_student.save();
+        return res.status(200).json({message: "Updated the student details..."});
+    } catch (error) {
+        console.log("Student credentials updation(Student-Controller)...");
+        console.log(error);
+        return res.status(500).json({message: 'Something went wrong...'});
+    }
 }
 
-module.exports = {studentRegister,studentLogin,studentTest};
+
+module.exports = {studentRegister,studentLogin,studentCredentialsUpdate};
