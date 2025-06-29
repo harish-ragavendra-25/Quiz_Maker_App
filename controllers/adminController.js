@@ -184,11 +184,26 @@ const addStudent = async(req,res) => {
         return res.status(500).json({message: "Something went wrong..."});
     }
 }
+
+const listAllFaculty = async(req,res) => {
+    try {
+        const listOfFaculty = await facultyModel.find({},{password:0});
+        return res.status(200).json({listOfFaculty});
+    } catch (error) {
+        console.log("listAllFaculty function (adminController)");
+        console.log(error);
+        return res.status(500).json({message: "server error on fetching list of faculty..."});
+    }
+}
+
+
+
 module.exports = {
     adminRegister,
     adminLogin,
     adminCredentialsUpdate,
     addCourse,
     addFaculty,
-    addStudent
+    addStudent,
+    listAllFaculty
 };
