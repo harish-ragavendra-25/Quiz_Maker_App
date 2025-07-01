@@ -12,6 +12,11 @@ const facultySchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  dept:{
+    type: String,
+    enum: ['AIDS','CSE','IT','IOT','ECE','E&I','TRAINING','MECH','CIVIL','BIO MEDICAL'],
+    require: true
+  },
   isBlocked: {
     type: Boolean,
     default: false,

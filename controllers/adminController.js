@@ -1,5 +1,6 @@
 const adminModel = require('../models/adminModel');
 const courseModel = require('../models/courseModel');
+const courseMappingModel = require('../models/courseMappingModel');
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -118,18 +119,27 @@ const adminCredentialsUpdate = async(req,res) => {
 
 const addCourse = async(req,res) => {
     try {
-        const { courseCode,courseName,description } = req.body;
+        const { courseCode,courseName,courseCategory,description } = req.body;
 
         if(!courseCode || !courseName){
             return res.status(400).json({message: "Course Code and Course Name is requried..."});
         }
+
+        if(!courseCategory){
+            return res.status(400).json({message: "Course Category required..."});
+        }
+
+        if(!description){
+            return res.status(400).json({message: "Add Course Description..."});
+        }
+        
 
         const existing = await courseModel.findOne({ $or: [ {courseCode} , {courseName} ]});
         if(existing){
             return res.status(400).json({message: 'Course with the same Name or Code already exists...'});
         }
 
-        const newCourse = new courseModel({courseCode,courseName,description});
+        const newCourse = new courseModel({courseCode,courseName,courseCategory,description});
         await newCourse.save();
 
         return res.status(201).json({message: `${courseCode} - ${courseName} created Successfully...`,course: newCourse});
@@ -141,17 +151,20 @@ const addCourse = async(req,res) => {
 
 const addFaculty = async(req,res) => {
     try {
-        const { userName,password } = req.body;
+        const { userName,password,dept } = req.body;
         if(!userName || !password) {
-            return res.status(400).json({message: "UserName and Password Fields are required...!!"});
+            return res.status(400).json({message: "UserName and Password are required..."});
         } 
+        if(!dept){
+            return res.status(400).json({message: "Department are required..."});
+        }
 
         const isExist = await facultyModel.findOne({ userName });
         if(isExist){
             return res.status(400).json({ message: `Faculty with userName: ${userName} already Exist...`});
         }
 
-        const newFaculty = new facultyModel({ userName,password });
+        const newFaculty = new facultyModel({ userName,password,dept });
         await newFaculty.save();
 
         return res.status(201).json({message: `Faculty ${userName} Created Successfully...`,faculty: newFaculty});
@@ -164,10 +177,14 @@ const addFaculty = async(req,res) => {
 
 const addStudent = async(req,res) => {
     try {
-        const { userName,password } = req.body;
+        const { userName,password,dept } = req.body;
         
         if(!userName || !password){
             return res.status(400).json({message: "UserName and Password Fields are required..."});
+        }
+        
+        if(!dept){
+            return res.status(400).json({message: "Department Field are required..."});
         }
 
         const isExist = await studentModel.findOne({ userName });
@@ -175,7 +192,7 @@ const addStudent = async(req,res) => {
             return res.status(400).json({message: `Student with userName: ${userName} already Exist...`});
         }
 
-        const newStudent = new studentModel({ userName,password });
+        const newStudent = new studentModel({ userName,password,dept });
         await newStudent.save();
         return res.status(201).json({message: `Student ${userName} created Sucessfully`,student: newStudent});
     } catch (error) {
@@ -196,7 +213,69 @@ const listAllFaculty = async(req,res) => {
     }
 }
 
+const listAllStudents = async(req,res) => {
+    try {
+        const listOfStudents = await studentModel.find({},{password: 0});
+        return res.status(200).json({listOfStudents});
+    } catch (error) {
+        console.log("listAllStudents function (adminController)");
+        console.log(error);
+        return res.status(500).json({message: "server error on fetching list of students..."});
+    }
+}
 
+const listAllCourses = async(req,res) => {
+    try {
+        const listOfCourses = await courseModel.find();
+        console.log(listAllCourses);
+        return res.status(200).json({listAllCourses});
+    } catch (error) {
+        console.log("listAllCourse function(adminController)");
+        console.log(error);
+        return res.status(500).json({message: "Server error on fetching list of courses..."});
+    }
+}
+
+const mapFacultyToCourse = async(req,res) => {
+    try {
+        const {facultyUserName,courseCode} = req.body;
+        if(!facultyUserName || !courseCode){
+            return res.status(400).json({message: "Faculty userName and Course code is required"});
+        }
+        
+        // course should Exist 
+        const course = await courseModel.findOne({courseCode: courseCode});
+        if(!course){
+            return res.status(400).json({message: `course: ${courseCode} not found`});
+        }
+        
+        // faculty should exist
+        const faculty = await facultyModel.findOne({userName: facultyUserName});
+        if(!faculty){
+            return res.status(400).json({message: `faculty: ${facultyUserName} not found `});
+        }
+
+        // check for existing mapping
+        const existedMap = await courseMappingModel.findOne({faculty: faculty._id,course: course._id});
+        if(existedMap){
+            return res.status(400).json({message: "FacultyId and CourseId is already Mapped..."});
+        }
+
+        const newMapping = new courseMappingModel({
+            faculty: faculty._id,
+            course: course._id,
+            student: [],
+            questionSets: []
+        });
+
+        await newMapping.save();
+        return res.status(200).json({message: "Faculty Mapped succesfully to the Course",mapping: newMapping});
+    } catch (error) {
+        console.log("mapFacultyToCourse function (admin Controller)");
+        console.log(error);
+        return res.status(500).json({message: "server error: try again!!"});
+    }
+}
 
 module.exports = {
     adminRegister,
@@ -205,5 +284,8 @@ module.exports = {
     addCourse,
     addFaculty,
     addStudent,
-    listAllFaculty
+    listAllFaculty,
+    listAllStudents,
+    listAllCourses,
+    mapFacultyToCourse
 };
