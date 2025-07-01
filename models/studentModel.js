@@ -12,6 +12,10 @@ const studentSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  name: {
+    type: String,
+    require: true
+  },
   dept:{
     type: String,
     enum: ['AIDS','CSE','IT','IOT','ECE','E&I','TRAINING','MECH','CIVIL','BIO MEDICAL'],

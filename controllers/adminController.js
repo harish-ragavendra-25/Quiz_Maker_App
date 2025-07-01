@@ -177,7 +177,7 @@ const addFaculty = async(req,res) => {
 
 const addStudent = async(req,res) => {
     try {
-        const { userName,password,dept } = req.body;
+        const { userName,password,name,dept } = req.body;
         
         if(!userName || !password){
             return res.status(400).json({message: "UserName and Password Fields are required..."});
@@ -192,7 +192,7 @@ const addStudent = async(req,res) => {
             return res.status(400).json({message: `Student with userName: ${userName} already Exist...`});
         }
 
-        const newStudent = new studentModel({ userName,password,dept });
+        const newStudent = new studentModel({ userName,password,name,dept });
         await newStudent.save();
         return res.status(201).json({message: `Student ${userName} created Sucessfully`,student: newStudent});
     } catch (error) {
