@@ -4,7 +4,7 @@ const router = express.Router();
 const verifyToken = require('../middleware/verifyToken');
 const verifyAdmin = require('../middleware/verifyAdmin');
 
-const {adminCredentialsUpdate,addCourse, addFaculty, addStudent, listAllFaculty, listAllStudents,mapFacultyToCourse, listAllCourses} = require('../controllers/adminController');
+const {adminCredentialsUpdate,addCourse, addFaculty, addStudent, listAllFaculty, listAllStudents,mapFacultyToCourse, listAllCourses,mapStudentIdsToCourseId,deleteStudent} = require('../controllers/adminController');
 
 // updation credentials
 router.post('/update-credentials',verifyToken,verifyAdmin,adminCredentialsUpdate);
@@ -29,5 +29,11 @@ router.get('/list-all-courses',verifyToken,verifyAdmin,listAllCourses);
 
 // Mapping Faculty to Course
 router.post('/map-faculty-to-course',verifyToken,verifyAdmin,mapFacultyToCourse);
+
+// Mapping Student to the map(Faculty to Course)
+router.post('/map-studentIds-to-map-of-facultytocourse',verifyToken,verifyAdmin,mapStudentIdsToCourseId);
+
+// Delete Student from studentModel and Faculty-course Mapping
+router.post('/delete-student',verifyToken,verifyAdmin,deleteStudent);
 
 module.exports = router;

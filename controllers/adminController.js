@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const facultyModel = require('../models/faculyModel');
 const studentModel = require('../models/studentModel');
+const { default: mongoose, set } = require('mongoose');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const saltNum = parseInt(process.env.saltNum);
@@ -280,6 +281,76 @@ const mapFacultyToCourse = async(req,res) => {
     }
 }
 
+const mapStudentIdsToCourseId = async(req,res) => {
+    try {
+        const { mappingId,studentIds } = req.body;
+        
+        if(!mappingId){
+            return res.status(400).json({message: "MappingId not found"});
+        }
+
+        if(!Array.isArray(studentIds) || studentIds.length === 0){
+            return res.status(400).json({message: "StudentIds are required"});
+        }
+
+        const mapping = await courseMappingModel.findById(mappingId);
+        if(!mapping){
+            return res.status(404).json({message: "Course Mapping not found..."});
+        }
+
+        const validIds = studentIds.filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+        const uniqueStudentIds = [
+            ...new Set(
+                [...mapping.student.map((id) => id.toString()),
+                ...validIds]
+            )
+        ];
+        mapping.student = uniqueStudentIds;
+
+        await mapping.save();
+        console.log(mapping);
+        console.log("-------------------------------------");
+        console.log(uniqueStudentIds);
+        return res.status(200).json({
+            message: "Student mapped successfully...",
+            mapping
+        });
+    } catch (error) {
+        console.log("mapStudentIDtoCourseId function(admin controller)");
+        console.log(error);
+        return res.status(500).json({message: "server error: try again!!"});        
+    }
+}
+
+const deleteStudent = async(req,res) => {
+    try {
+        const {studentId} = req.body;
+    
+        if(!mongoose.Types.ObjectId.isValid(studentId)){
+            return res.status(400).json({message: "Student Id requried..."});
+        }
+
+        const deletedStudent = await studentModel.findByIdAndDelete(studentId);
+        if(!deleteStudent){
+            return res.status(400).json({message: `${studentId} not found...`});
+        }
+
+        await courseMappingModel.updateMany(
+            {student: studentId},
+            { $pull: {student:studentId}}
+        );
+        
+        return res.status(200).json({
+            message: `Student: ${deletedStudent.userName} is deleted and removed from all course Mappings`
+        });
+    } catch (error) {
+        console.log("deleted Student: (admin controller)");
+        console.log(error);
+        return res.status(500).json({message: "Server error: try again!!"});
+    }
+}
+
 module.exports = {
     adminRegister,
     adminLogin,
@@ -290,5 +361,7 @@ module.exports = {
     listAllFaculty,
     listAllStudents,
     listAllCourses,
-    mapFacultyToCourse
+    mapFacultyToCourse,
+    mapStudentIdsToCourseId,
+    deleteStudent
 };
