@@ -14,6 +14,12 @@ const courseSchema = new mongoose.Schema({
     enum: ['AIDS','CSE','IT','IOT','ECE','E&I','TRAINING','MECH','CIVIL','BIO MEDICAL'],
     require: true
   },
+  status:{
+    type: String,
+    enum: ['active','inactive'],
+    require: true,
+    default: 'active'
+  },
   description: {
     type: String,
     require: true
