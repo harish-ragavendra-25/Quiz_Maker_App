@@ -242,7 +242,9 @@ const listAllCourses = async(req,res) => {
 const adminUpdationOfFacultyDetails = async(req,res) => {
     try {
         const {facultyId} = req.params;
-        console.log(facultyId);
+        if(!facultyId){
+            return res.status(400).json({message: "Faculty Id is required"});
+        }
         const {name,dept,isBlocked} = req.body;
 
         const faculty = await facultyModel.findById(facultyId);
@@ -252,7 +254,7 @@ const adminUpdationOfFacultyDetails = async(req,res) => {
 
         if(name) faculty.name = name;
         if(dept) faculty.dept = dept;
-        if(isBlocked) faculty.isBlocked = isBlocked;
+        if(typeof isBlocked === 'boolean') faculty.isBlocked = isBlocked;
 
         await faculty.save();
         return res.status(200).json({message: `faculty - ${faculty.userName} details updated`});
@@ -268,6 +270,9 @@ const adminUpdationOfStudentDetails = async(req,res) => {
         const {studentId} = req.params;
         const {name,dept,isBlocked} = req.body;
 
+        if(!studentId){
+            return res.status(400).json({message: "Student Id is required"});
+        }
         const student = await studentModel.findById(studentId);
         if(!student){
             return res.status(404).json({message: "Student not found..."});
@@ -275,7 +280,7 @@ const adminUpdationOfStudentDetails = async(req,res) => {
 
         if(name) student.name = name;
         if(dept) student.dept = dept;
-        if(isBlocked) student.isBlocked = isBlocked;
+        if(typeof isBlocked === 'boolean') student.isBlocked = isBlocked;
 
         await student.save();
         return res.status(200).json({message: `student - ${student.userName} details updated`});
