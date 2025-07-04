@@ -35,7 +35,7 @@ const facultySchema = new mongoose.Schema({
     type: String,
     default: 'faculty'
   }
-});
+},{timestamps: true});
 
 facultySchema.pre('save',async function(next){
   try {

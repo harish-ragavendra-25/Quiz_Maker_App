@@ -16,6 +16,10 @@ const studentRegister = async(req,res) => {
             return res.status(400).json({message: "user already exist!!"});
         }
 
+        if(existingUser.isBlocked){
+            return res.status(403).json({message: "Account is blocked"});
+        }
+
         const newStudent = new studentModel({
             userName,
             password

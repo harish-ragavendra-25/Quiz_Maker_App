@@ -9,7 +9,6 @@ const studentModel = require('../models/studentModel');
 const { default: mongoose, set } = require('mongoose');
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const saltNum = parseInt(process.env.saltNum);
 
 const adminRegister = async(req,res) => {
     try {
@@ -240,6 +239,53 @@ const listAllCourses = async(req,res) => {
     }
 }
 
+const adminUpdationOfFacultyDetails = async(req,res) => {
+    try {
+        const {facultyId} = req.params;
+        console.log(facultyId);
+        const {name,dept,isBlocked} = req.body;
+
+        const faculty = await facultyModel.findById(facultyId);
+        if(!faculty){
+            return res.status(404).json({message: "Faculty not found..."});
+        }
+
+        if(name) faculty.name = name;
+        if(dept) faculty.dept = dept;
+        if(isBlocked) faculty.isBlocked = isBlocked;
+
+        await faculty.save();
+        return res.status(200).json({message: `faculty - ${faculty.userName} details updated`});
+    } catch (error) {
+        console.log("updation of faculty Details (AdminController)");
+        console.log(error);
+        return res.status(500).json({message: "Server error on upation of details"});
+    }
+}
+
+const adminUpdationOfStudentDetails = async(req,res) => {
+    try {
+        const {studentId} = req.params;
+        const {name,dept,isBlocked} = req.body;
+
+        const student = await studentModel.findById(studentId);
+        if(!student){
+            return res.status(404).json({message: "Student not found..."});
+        }
+
+        if(name) student.name = name;
+        if(dept) student.dept = dept;
+        if(isBlocked) student.isBlocked = isBlocked;
+
+        await student.save();
+        return res.status(200).json({message: `student - ${student.userName} details updated`});
+    } catch (error) {
+        console.log("updation of student Details (AdminController)");
+        console.log(error);
+        return res.status(500).json({message: "Server error on upation of details"});
+    }
+}
+
 const mapFacultyToCourse = async(req,res) => {
     try {
         const {facultyUserName,courseCode} = req.body;
@@ -361,6 +407,8 @@ module.exports = {
     listAllFaculty,
     listAllStudents,
     listAllCourses,
+    adminUpdationOfFacultyDetails,
+    adminUpdationOfStudentDetails,
     mapFacultyToCourse,
     mapStudentIdsToCourseId,
     deleteStudent

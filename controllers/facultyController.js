@@ -44,6 +44,10 @@ const facultyLogin = async(req,res) => {
             return res.status(404).json({message: `user with ${userName} not found !!`});
         }
 
+        if(user.isBlocked){
+            return res.status(403).json({message: "Account is blocked"});
+        }
+
         const isMatch = await bcrypt.compare(password,user.password);
         if(!isMatch){
             return res.status(404).json({message: `Invalid password credentials !!`});
@@ -90,6 +94,10 @@ const facultyCredentialsUpdate = async(req,res) => {
 
         if(!logged_faculty){
             return res.status(404).json({message: "Faculty not found..."});
+        }
+
+        if(logged_faculty.isBlocked){
+            return res.status(403).json({message: "Account is blocked"});
         }
 
         const isMatch = await bcrypt.compare(oldPassword,logged_faculty.password);
