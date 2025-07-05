@@ -16,7 +16,8 @@ const {
     mapStudentIdsToCourseId,
     deleteStudent, 
     adminUpdationOfFacultyDetails, 
-    adminUpdationOfStudentDetails
+    adminUpdationOfStudentDetails,
+    deleteFaculty
 } = require('../controllers/adminController');
 
 // updation credentials
@@ -54,5 +55,8 @@ router.post('/map-studentIds-to-map-of-facultytocourse',verifyToken,verifyAdmin,
 
 // Delete Student from studentModel and Faculty-course Mapping
 router.post('/delete-student',verifyToken,verifyAdmin,deleteStudent);
+
+// Delete Faculty from FacultyModel and Faculty-course Mapping
+router.post('/delete-faculty',verifyToken,verifyAdmin,deleteFaculty);
 
 module.exports = router;

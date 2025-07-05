@@ -384,7 +384,7 @@ const deleteStudent = async(req,res) => {
 
         const deletedStudent = await studentModel.findByIdAndDelete(studentId);
         if(!deleteStudent){
-            return res.status(400).json({message: `${studentId} not found...`});
+            return res.status(400).json({message: `student not found...`});
         }
 
         await courseMappingModel.updateMany(
@@ -397,6 +397,32 @@ const deleteStudent = async(req,res) => {
         });
     } catch (error) {
         console.log("deleted Student: (admin controller)");
+        console.log(error);
+        return res.status(500).json({message: "Server error: try again!!"});
+    }
+}
+
+const deleteFaculty = async(req,res) => {
+    try {
+        const {facultyId} = req.body;
+
+        if(!mongoose.Types.ObjectId.isValid(facultyId)){
+            return res.status(400).json({message: "Faculty Id required..."});
+        }
+
+        const deletedFaculty = await facultyModel.findByIdAndDelete(facultyId);
+        if(!deleteFaculty){
+            return res.status(400).json({message: `faculty not found`});
+        }
+
+        await courseMappingModel.updateMany(
+            {faculty: facultyId},
+            {$pull: {faculty: facultyId}}
+        );
+
+        return res.status(200).json({message: `${deletedFaculty.name} is deleted and removed all course Mapping Sucessfully...`});
+    } catch (error) {
+        console.log("deleted Faculty: (admin controller)");
         console.log(error);
         return res.status(500).json({message: "Server error: try again!!"});
     }
@@ -416,5 +442,6 @@ module.exports = {
     adminUpdationOfStudentDetails,
     mapFacultyToCourse,
     mapStudentIdsToCourseId,
-    deleteStudent
+    deleteStudent,
+    deleteFaculty
 };
