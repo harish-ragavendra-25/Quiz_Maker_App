@@ -209,7 +209,51 @@ const listQuestionSetsOfCourseMapping = async(req,res) => {
     } catch (error) {
         console.log("Faculty Controller (listQuestionSetsOfCourseMapping");
         console.log(error);
-        return res.status(500).json("message: 'Something went wrong");
+        return res.status(500).json({message: "Something went wrong"});
+    }
+}
+
+const createQuestionSet = async(req,res) => {
+    try {
+        const {courseMappingId} = req.params;
+        const {label,durationOfTest} = req.body;
+        const logged_faculty_id = req.user.id;
+
+        if(!courseMappingId){
+            return res.status(400).json({message: "Course Mapping Id not Found"});
+        }
+        if(!label){
+            return res.status(400).json({message: "Add Label to Categorize the Question Set"});
+        }
+        if(!durationOfTest){
+            return res.status(400).json({message: "Include Test Duration"});
+        }
+
+        // Validate Course Mapping
+        const mapping = await courseMappingModel.findById(courseMappingId);
+        if(!mapping){
+            return res.status(404).json({message: "Course Mapping not found"});
+        }
+
+        // Creation of new Question Set
+        const new_QuestionSet = new questionSetModel({
+            label,
+            courseMapping: mapping,
+            createdBy: logged_faculty_id,
+            durationOfTest: durationOfTest
+        });
+
+        mapping.questionSets.push(new_QuestionSet._id);
+        await new_QuestionSet.save();
+
+        return res.status(201).json({
+            message: "Question Set created and Linked Successfully",
+            newQuestionSet: new_QuestionSet
+        });
+    } catch (error) {
+        console.log("Faculty Controller (create Question Set)");
+        console.log(error);
+        return res.status(500).json({message: "Something went wrong"});
     }
 }
 module.exports = {
@@ -219,5 +263,6 @@ module.exports = {
     ListOfAssignedCourses,
     getDetailsOfLoggedFaculty,
     listStudentsOfCourseMapping,
-    listQuestionSetsOfCourseMapping
+    listQuestionSetsOfCourseMapping,
+    createQuestionSet
 };

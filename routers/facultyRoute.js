@@ -9,7 +9,8 @@ const {
     ListOfAssignedCourses,
     getDetailsOfLoggedFaculty,
     listStudentsOfCourseMapping,
-    listQuestionSetsOfCourseMapping
+    listQuestionSetsOfCourseMapping,
+    createQuestionSet
  } = require('../controllers/facultyController');
 
 // Updation Of Credentials
@@ -26,5 +27,8 @@ router.get('/list-students-course-mapping/:mappingId',verifyToken,verifyFaculty,
 
 // List Question Sets of Particular Course Mapping
 router.get('/list-all-question-set/:mappingId',verifyToken,verifyFaculty,listQuestionSetsOfCourseMapping);
+
+// Creation Of Question Set of Particular Course Mapping
+router.post('/create-questionset-mapping/:courseMappingId',verifyToken,verifyFaculty,createQuestionSet);
 
 module.exports = router;

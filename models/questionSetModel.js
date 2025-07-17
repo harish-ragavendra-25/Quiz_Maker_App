@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const questionSetSchema = new mongoose.Schema({
   label: {
     type: String,
-    enum: ["Easy", "Medium", "Hard"],
     require: true,
   },
   courseMapping: {
