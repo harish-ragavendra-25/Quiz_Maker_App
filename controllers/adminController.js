@@ -362,9 +362,6 @@ const mapStudentIdsToCourseId = async(req,res) => {
         mapping.student = uniqueStudentIds;
 
         await mapping.save();
-        console.log(mapping);
-        console.log("-------------------------------------");
-        console.log(uniqueStudentIds);
         return res.status(200).json({
             message: "Student mapped successfully...",
             mapping

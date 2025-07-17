@@ -168,7 +168,21 @@ const ListOfAssignedCourses = async(req,res) => {
 
 const listStudentsOfCourseMapping = async(req,res) => {
     try {
-        console.log("listStudentsOfCourseMapping");
+        const {mappingId} = req.params;
+
+        if(!mappingId){
+            return res.status(400).json({message: "Mapping Id is required..."});
+        }
+
+        const mapping = await courseMappingModel.findById(mappingId).populate('student','-password');
+        if(!mapping){
+            return res.status(404).json({message: "Mapping not found"});
+        }
+
+        return res.status(200).json({
+            message: "List Of Students Fetched Successfully",
+            mapping
+        })
     } catch (error) {
         console.log("Faculty Controller (listStudentsOfCourseMapping)");
         console.log(error);

@@ -21,6 +21,6 @@ router.get('/getAssignedCourses',verifyToken,verifyFaculty,ListOfAssignedCourses
 router.get('/get-logged-faculty-details',verifyToken,verifyFaculty,getDetailsOfLoggedFaculty);
 
 // List Students of Particular Course Faculty Mapping
-router.get('/list-students-course-mapping/:id',verifyToken,verifyFaculty,listStudentsOfCourseMapping);
+router.get('/list-students-course-mapping/:mappingId',verifyToken,verifyFaculty,listStudentsOfCourseMapping);
 
 module.exports = router;
