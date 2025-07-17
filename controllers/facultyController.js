@@ -2,6 +2,7 @@ const facultyModel = require('../models/faculyModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { populate } = require('../models/studentModel');
+const courseMappingModel = require('../models/courseMappingModel');
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const facultyRegister = async(req,res) => {
@@ -144,23 +145,19 @@ const getDetailsOfLoggedFaculty = async(req,res) => {
 const ListOfAssignedCourses = async(req,res) => {
     try {
         const logged_faculty_id = req.user.id;
-        const faculty = await facultyModel.findById(logged_faculty_id).populate({
-            path: 'assignedCourses',
-            populate: {
-                path: 'course',
-                model: 'courseModel'
-            }
-        });
+
+        const mapping = await courseMappingModel
+            .find({ faculty: logged_faculty_id})
+            .populate('course','courseCode courseName courseCategory');
+
         
-        if(!faculty){
+        if(!mapping){
             return res.status(404).json({message: 'Faculty not Found'});
         }
-        if(faculty.assignedCourses.length == 0){
-            return res.status(200).json({message: `${faculty.name} not assigned with courses`});
-        }
+        
         return res.status(200).json({
             message: 'Assigned Courses fetched Successfully...',
-            AssignedCourses: faculty.assignedCourses
+            mapping
         });
     } catch (error) {
         console.log("Faculty Controller (List of Assigned Courses)");
@@ -169,4 +166,21 @@ const ListOfAssignedCourses = async(req,res) => {
     }
 }
 
-module.exports = {facultyRegister,facultyLogin,facultyCredentialsUpdate,ListOfAssignedCourses,getDetailsOfLoggedFaculty};
+const listStudentsOfCourseMapping = async(req,res) => {
+    try {
+        console.log("listStudentsOfCourseMapping");
+    } catch (error) {
+        console.log("Faculty Controller (listStudentsOfCourseMapping)");
+        console.log(error);
+        return res.status(500).json({message: 'Something went wrong'});
+    }
+}
+
+module.exports = {
+    facultyRegister,
+    facultyLogin,
+    facultyCredentialsUpdate,
+    ListOfAssignedCourses,
+    getDetailsOfLoggedFaculty,
+    listStudentsOfCourseMapping
+};

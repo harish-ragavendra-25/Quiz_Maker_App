@@ -7,7 +7,8 @@ const verifyFaculty = require('../middleware/verifyFaculty');
 const { 
     facultyCredentialsUpdate,
     ListOfAssignedCourses,
-    getDetailsOfLoggedFaculty
+    getDetailsOfLoggedFaculty,
+    listStudentsOfCourseMapping
  } = require('../controllers/facultyController');
 
 // Updation Of Credentials
@@ -18,5 +19,8 @@ router.get('/getAssignedCourses',verifyToken,verifyFaculty,ListOfAssignedCourses
 
 // Get details of Logged Faculty
 router.get('/get-logged-faculty-details',verifyToken,verifyFaculty,getDetailsOfLoggedFaculty);
+
+// List Students of Particular Course Faculty Mapping
+router.get('/list-students-course-mapping/:id',verifyToken,verifyFaculty,listStudentsOfCourseMapping);
 
 module.exports = router;
