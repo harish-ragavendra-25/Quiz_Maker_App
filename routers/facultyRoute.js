@@ -6,7 +6,8 @@ const verifyFaculty = require('../middleware/verifyFaculty');
 
 const { 
     facultyCredentialsUpdate,
-    ListOfAssignedCourses
+    ListOfAssignedCourses,
+    getDetailsOfLoggedFaculty
  } = require('../controllers/facultyController');
 
 // Updation Of Credentials
@@ -14,5 +15,8 @@ router.post('/update-credentials',verifyToken,verifyFaculty,facultyCredentialsUp
 
 // Get List Of Assigned Courses
 router.get('/getAssignedCourses',verifyToken,verifyFaculty,ListOfAssignedCourses);
+
+// Get details of Logged Faculty
+router.get('/get-logged-faculty-details',verifyToken,verifyFaculty,getDetailsOfLoggedFaculty);
 
 module.exports = router;

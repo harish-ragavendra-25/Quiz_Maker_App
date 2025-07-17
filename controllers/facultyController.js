@@ -122,6 +122,25 @@ const facultyCredentialsUpdate = async(req,res) => {
     }
 }
 
+const getDetailsOfLoggedFaculty = async(req,res) => {
+    try {
+        const logged_faculty_id = req.user.id;
+        const faculty = await facultyModel.findById(logged_faculty_id);
+        if(!faculty){
+            return res.status(404).json({message: "Faculty not found..."});
+        }
+
+        return res.status(200).json({
+            message: 'Faculty Details fetched',
+            faculty: faculty
+        });
+    } catch (error) {
+        console.log("Faculty Controller(getDetailsOfLoggedFaculty)");
+        console.log(error);
+        return res.status(500).json({message: 'Something went wrong'});
+    }
+}
+
 const ListOfAssignedCourses = async(req,res) => {
     try {
         const logged_faculty_id = req.user.id;
@@ -150,4 +169,4 @@ const ListOfAssignedCourses = async(req,res) => {
     }
 }
 
-module.exports = {facultyRegister,facultyLogin,facultyCredentialsUpdate,ListOfAssignedCourses};
+module.exports = {facultyRegister,facultyLogin,facultyCredentialsUpdate,ListOfAssignedCourses,getDetailsOfLoggedFaculty};
