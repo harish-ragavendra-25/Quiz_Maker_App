@@ -8,7 +8,8 @@ const {
     facultyCredentialsUpdate,
     ListOfAssignedCourses,
     getDetailsOfLoggedFaculty,
-    listStudentsOfCourseMapping
+    listStudentsOfCourseMapping,
+    listQuestionSetsOfCourseMapping
  } = require('../controllers/facultyController');
 
 // Updation Of Credentials
@@ -22,5 +23,8 @@ router.get('/get-logged-faculty-details',verifyToken,verifyFaculty,getDetailsOfL
 
 // List Students of Particular Course Faculty Mapping
 router.get('/list-students-course-mapping/:mappingId',verifyToken,verifyFaculty,listStudentsOfCourseMapping);
+
+// List Question Sets of Particular Course Mapping
+router.get('/list-all-question-set/:mappingId',verifyToken,verifyFaculty,listQuestionSetsOfCourseMapping);
 
 module.exports = router;

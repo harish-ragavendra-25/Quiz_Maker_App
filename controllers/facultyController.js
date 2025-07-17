@@ -1,8 +1,9 @@
 const facultyModel = require('../models/faculyModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { populate } = require('../models/studentModel');
+const studentModel = require('../models/studentModel');
 const courseMappingModel = require('../models/courseMappingModel');
+const questionSetModel = require('../models/questionSetModel');
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const facultyRegister = async(req,res) => {
@@ -190,11 +191,33 @@ const listStudentsOfCourseMapping = async(req,res) => {
     }
 }
 
+const listQuestionSetsOfCourseMapping = async(req,res) => {
+    try {
+        const {mappingId} = req.params;
+        if(!mappingId){
+            return res.status(400).json("message: mapping Id is required");
+        }
+        const mapping = await courseMappingModel.findById(mappingId).populate('questionSets');
+        if(!mapping){
+            return res.status(404).json({message: "Course Mapping not found"});
+        }
+        
+        return res.status(200).json({
+            message: "Question Sets Fetched Successfully",
+            questionSets: mapping.questionSets
+        });
+    } catch (error) {
+        console.log("Faculty Controller (listQuestionSetsOfCourseMapping");
+        console.log(error);
+        return res.status(500).json("message: 'Something went wrong");
+    }
+}
 module.exports = {
     facultyRegister,
     facultyLogin,
     facultyCredentialsUpdate,
     ListOfAssignedCourses,
     getDetailsOfLoggedFaculty,
-    listStudentsOfCourseMapping
+    listStudentsOfCourseMapping,
+    listQuestionSetsOfCourseMapping
 };
