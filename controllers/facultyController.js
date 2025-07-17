@@ -1,6 +1,7 @@
 const facultyModel = require('../models/faculyModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { populate } = require('../models/studentModel');
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const facultyRegister = async(req,res) => {
@@ -121,4 +122,32 @@ const facultyCredentialsUpdate = async(req,res) => {
     }
 }
 
-module.exports = {facultyRegister,facultyLogin,facultyCredentialsUpdate};
+const ListOfAssignedCourses = async(req,res) => {
+    try {
+        const logged_faculty_id = req.user.id;
+        const faculty = await facultyModel.findById(logged_faculty_id).populate({
+            path: 'assignedCourses',
+            populate: {
+                path: 'course',
+                model: 'courseModel'
+            }
+        });
+        
+        if(!faculty){
+            return res.status(404).json({message: 'Faculty not Found'});
+        }
+        if(faculty.assignedCourses.length == 0){
+            return res.status(200).json({message: `${faculty.name} not assigned with courses`});
+        }
+        return res.status(200).json({
+            message: 'Assigned Courses fetched Successfully...',
+            AssignedCourses: faculty.assignedCourses
+        });
+    } catch (error) {
+        console.log("Faculty Controller (List of Assigned Courses)");
+        console.log(error);
+        return res.status(500).json({message: 'Something went wrong...'});
+    }
+}
+
+module.exports = {facultyRegister,facultyLogin,facultyCredentialsUpdate,ListOfAssignedCourses};

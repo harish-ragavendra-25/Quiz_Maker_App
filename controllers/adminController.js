@@ -245,14 +245,14 @@ const adminUpdationOfFacultyDetails = async(req,res) => {
         if(!facultyId){
             return res.status(400).json({message: "Faculty Id is required"});
         }
-        const {name,dept,isBlocked} = req.body;
+        const {userName,dept,isBlocked} = req.body;
 
         const faculty = await facultyModel.findById(facultyId);
         if(!faculty){
             return res.status(404).json({message: "Faculty not found..."});
         }
 
-        if(name) faculty.name = name;
+        if(userName) faculty.userName = userName;
         if(dept) faculty.dept = dept;
         if(typeof isBlocked === 'boolean') faculty.isBlocked = isBlocked;
 
@@ -268,7 +268,7 @@ const adminUpdationOfFacultyDetails = async(req,res) => {
 const adminUpdationOfStudentDetails = async(req,res) => {
     try {
         const {studentId} = req.params;
-        const {name,dept,isBlocked} = req.body;
+        const {userName,dept,isBlocked} = req.body;
 
         if(!studentId){
             return res.status(400).json({message: "Student Id is required"});
@@ -278,7 +278,7 @@ const adminUpdationOfStudentDetails = async(req,res) => {
             return res.status(404).json({message: "Student not found..."});
         }
 
-        if(name) student.name = name;
+        if(userName) student.userName = userName;
         if(dept) student.dept = dept;
         if(typeof isBlocked === 'boolean') student.isBlocked = isBlocked;
 
@@ -323,7 +323,9 @@ const mapFacultyToCourse = async(req,res) => {
             questionSets: []
         });
 
-        await newMapping.save();
+        faculty.assignedCourses.push(newMapping._id);
+        await faculty.save();
+        await newMapping.save();    
         return res.status(200).json({message: "Faculty Mapped succesfully to the Course",mapping: newMapping});
     } catch (error) {
         console.log("mapFacultyToCourse function (admin Controller)");
