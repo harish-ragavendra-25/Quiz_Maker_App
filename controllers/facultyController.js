@@ -1,10 +1,12 @@
 const facultyModel = require('../models/faculyModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const JWT_SECRET = process.env.JWT_SECRET;
+
 const studentModel = require('../models/studentModel');
 const courseMappingModel = require('../models/courseMappingModel');
 const questionSetModel = require('../models/questionSetModel');
-const JWT_SECRET = process.env.JWT_SECRET;
+const questionModel = require('../models/questionModel');
 
 const facultyRegister = async(req,res) => {
     try {
@@ -244,6 +246,7 @@ const createQuestionSet = async(req,res) => {
         });
 
         mapping.questionSets.push(new_QuestionSet._id);
+        await mapping.save();
         await new_QuestionSet.save();
 
         return res.status(201).json({
@@ -256,6 +259,36 @@ const createQuestionSet = async(req,res) => {
         return res.status(500).json({message: "Something went wrong"});
     }
 }
+
+const addListOfQuestionToQuestionSet = async(req,res) => {
+    try {
+        const { questionSetId } = req.params;
+        const { questions } = req.body;
+
+        if(!questionSetId || !Array.isArray(questions) || questions.length == 0){
+            return res.status(400).json({message: "QuestionSet or Valid Questions not found"});
+        }
+
+        const questionSet = await questionSetModel.findById(questionSetId);
+        if(!questionSet){
+            return res.status(404).json({message: "Question Set not found..."});
+        }
+
+        const insertedQuestions = await questionModel.insertMany(questions);
+        const questionIds = insertedQuestions.map(q => q._id);
+        questionSet.questions.push(...questionIds);
+        await questionSet.save();
+        return res.status(200).json({
+            message: "Questions Inserted Sucessfully",
+            questionSet
+        });
+    } catch (error) {
+        console.log("Faculty Controller (addListOfQuestionToQuestionSet)");
+        console.log(error);
+        return res.status(500).json({message: "Something went wrong"});
+    }
+}
+
 module.exports = {
     facultyRegister,
     facultyLogin,
@@ -264,5 +297,6 @@ module.exports = {
     getDetailsOfLoggedFaculty,
     listStudentsOfCourseMapping,
     listQuestionSetsOfCourseMapping,
-    createQuestionSet
+    createQuestionSet,
+    addListOfQuestionToQuestionSet
 };
