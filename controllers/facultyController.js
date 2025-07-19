@@ -316,6 +316,31 @@ const editQuestion = async(req,res) => {
     }
 }
 
+const deleteQuestion = async(req,res) => {
+    try {
+        const { questionId } = req.params;
+        const deletedquestion = await questionModel.findByIdAndDelete(questionId);
+        
+        if(!deletedquestion){
+        return res.status(404).json({message: "Question not found"});
+        }
+
+        await questionSetModel.updateMany(
+            {questions: questionId },
+            { $pull: {questions: questionId }}
+        );
+
+        return res.status(200).json({
+            message: "Question Deleted Successfully and Question set updated...",
+            deletedquestion
+        });
+    } catch (error) {
+        console.log("faculty controller(delete Question)");
+        console.log(error);
+        return res.status(500).json({message: "Something went wrong"});
+    }
+}
+
 module.exports = {
     facultyRegister,
     facultyLogin,
@@ -326,5 +351,6 @@ module.exports = {
     listQuestionSetsOfCourseMapping,
     createQuestionSet,
     addListOfQuestionToQuestionSet,
-    editQuestion
+    editQuestion,
+    deleteQuestion
 };

@@ -12,7 +12,8 @@ const {
     listQuestionSetsOfCourseMapping,
     createQuestionSet,
     addListOfQuestionToQuestionSet,
-    editQuestion
+    editQuestion,
+    deleteQuestion
  } = require('../controllers/facultyController');
 
 // Updation Of Credentials
@@ -38,5 +39,8 @@ router.post('/add-list-of-questions-questionSet/:questionSetId',verifyToken,veri
 
 // Edit question
 router.put('/edit-question/:questionId',verifyToken,verifyFaculty,editQuestion);
+
+// Delete Question
+router.delete('/delete-question/:questionId',verifyToken,verifyFaculty,deleteQuestion);
 
 module.exports = router;
