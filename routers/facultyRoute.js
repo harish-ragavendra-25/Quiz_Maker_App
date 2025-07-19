@@ -11,7 +11,8 @@ const {
     listStudentsOfCourseMapping,
     listQuestionSetsOfCourseMapping,
     createQuestionSet,
-    addListOfQuestionToQuestionSet
+    addListOfQuestionToQuestionSet,
+    editQuestion
  } = require('../controllers/facultyController');
 
 // Updation Of Credentials
@@ -34,5 +35,8 @@ router.post('/create-questionset-mapping/:courseMappingId',verifyToken,verifyFac
 
 // Add List Of Questions To The Question Set
 router.post('/add-list-of-questions-questionSet/:questionSetId',verifyToken,verifyFaculty,addListOfQuestionToQuestionSet);
+
+// Edit question
+router.put('/edit-question/:questionId',verifyToken,verifyFaculty,editQuestion);
 
 module.exports = router;

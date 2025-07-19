@@ -289,6 +289,33 @@ const addListOfQuestionToQuestionSet = async(req,res) => {
     }
 }
 
+const editQuestion = async(req,res) => {
+    try {
+        const { questionId } = req.params;
+        const { questionText,options,correctAnswer,mark } = req.body;
+
+        const question = await questionModel.findById(questionId);
+        if(!question){
+            return res.status(404).json({message: "Question not found"});
+        }
+
+        if(questionText) question.questionText = questionText;
+        if(options) question.options = options;
+        if(correctAnswer) question.correctAnswer = correctAnswer;
+        if(mark) question.mark = mark;
+
+        await question.save();
+        return res.status(200).json({
+            message: "Question updated successfully",
+            question
+        });
+    } catch (error) {
+        console.log("faculty controller(edit question)");
+        console.log(error);
+        return res.status(500).json({message: "Something went wrong"});
+    }
+}
+
 module.exports = {
     facultyRegister,
     facultyLogin,
@@ -298,5 +325,6 @@ module.exports = {
     listStudentsOfCourseMapping,
     listQuestionSetsOfCourseMapping,
     createQuestionSet,
-    addListOfQuestionToQuestionSet
+    addListOfQuestionToQuestionSet,
+    editQuestion
 };
