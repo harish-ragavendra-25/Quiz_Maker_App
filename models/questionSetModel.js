@@ -34,6 +34,10 @@ const questionSetSchema = new mongoose.Schema({
   DueDate: {
     type: Date,
     default: () => new Date(Date.now() + 24*60*60*1000)
+  },
+  attemptsAllowed: {
+    type: Number,
+    default: 1,
   }
 });
 
