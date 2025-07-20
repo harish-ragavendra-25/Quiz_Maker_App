@@ -118,4 +118,8 @@ const studentCredentialsUpdate = async(req,res) => {
     }
 }
 
-module.exports = {studentRegister,studentLogin,studentCredentialsUpdate};
+module.exports = {
+    studentRegister,
+    studentLogin,
+    studentCredentialsUpdate
+};
