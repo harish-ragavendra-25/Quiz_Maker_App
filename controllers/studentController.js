@@ -141,9 +141,44 @@ const getLoggedStudentDetails = async(req,res) => {
     }
 }
 
+const listOfEnrolledCourses = async(req,res) => {
+    try {
+        const logged_student_id = req.user.id;
+
+        const student = await studentModel.findById(logged_student_id)
+                                          .populate({
+                                            path: 'enrolledCourse',
+                                            populate: {
+                                                path: 'course',
+                                                select: 'courseCode courseName courseCategory'
+                                            },
+                                            select: 'course'
+                                          });
+        if(!student){
+            return res.status(404).json({message: 'Student not found'});
+        }
+
+        const enrolledCourses = student.enrolledCourse.map((course) => ({
+            courseCode: course.course.courseCode,
+            courseName: course.course.courseName,
+            courseCategory: course.course.courseCategory
+        }));
+
+        return res.status(200).json({
+            message: "List Of Enrolled Course Fetched Successfully",
+            enrolledCourses
+        });
+    } catch (error) {
+        console.log("Student Controller(ListOfEnrolledCourses)");
+        console.log(error);
+        return res.status(500).json({message: "Something went wrong"});
+    }
+}
+
 module.exports = {
     studentRegister,
     studentLogin,
     studentCredentialsUpdate,
-    getLoggedStudentDetails
+    getLoggedStudentDetails,
+    listOfEnrolledCourses
 };
