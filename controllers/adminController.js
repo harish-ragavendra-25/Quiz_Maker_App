@@ -350,9 +350,7 @@ const mapStudentIdsToCourseId = async(req,res) => {
         if(!mapping){
             return res.status(404).json({message: "Course Mapping not found..."});
         }
-
         const validIds = studentIds.filter((id) => mongoose.Types.ObjectId.isValid(id));
-
         const uniqueStudentIds = [
             ...new Set(
                 [...mapping.student.map((id) => id.toString()),
@@ -360,6 +358,14 @@ const mapStudentIdsToCourseId = async(req,res) => {
             )
         ];
         mapping.student = uniqueStudentIds;
+
+        await Promise.all(validIds.map(async(studentId) => {
+            await studentModel.findByIdAndUpdate(
+                studentId,
+                { $addToSet: { enrolledCourse: mapping._id }},
+                { new: true }
+            )
+        }));
 
         await mapping.save();
         return res.status(200).json({

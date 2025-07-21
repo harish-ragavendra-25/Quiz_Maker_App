@@ -118,8 +118,32 @@ const studentCredentialsUpdate = async(req,res) => {
     }
 }
 
+const getLoggedStudentDetails = async(req,res) => {
+    try {
+        const logged_student_id = req.user.id;
+        const student = await studentModel
+                                .findById(logged_student_id)
+                                .select('-password')
+                                .populate('enrolledCourse','courseCode courseName dept');
+
+        if(!student){
+            return res.status(404).json({message: 'Student not found'});
+        }
+
+        return res.status(200).json({
+            message: 'Student Details Fetched',
+            student
+        });
+    } catch (error) {
+        console.log("Student Controller(getLoggedDetails)");
+        console.log(error);
+        return res.status(500).json({message: 'Something went wrong...'});
+    }
+}
+
 module.exports = {
     studentRegister,
     studentLogin,
-    studentCredentialsUpdate
+    studentCredentialsUpdate,
+    getLoggedStudentDetails
 };
