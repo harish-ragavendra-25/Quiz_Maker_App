@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const questionSetModel = require('../models/questionSetModel');
+const { default: mongoose } = require('mongoose');
+
 const studentRegister = async(req,res) => {
     try {
         const { userName,password } = req.body;
@@ -159,6 +162,7 @@ const listOfEnrolledCourses = async(req,res) => {
         }
 
         const enrolledCourses = student.enrolledCourse.map((course) => ({
+            mappingId: course._id,
             courseCode: course.course.courseCode,
             courseName: course.course.courseName,
             courseCategory: course.course.courseCategory
@@ -175,10 +179,31 @@ const listOfEnrolledCourses = async(req,res) => {
     }
 }
 
+const listQuestionSetOfCourseMapping = async(req,res) => {
+    try {
+        const { mappingId } = req.params;
+        if(!mongoose.Types.ObjectId.isValid(mappingId)){
+            return res.status(400).json({message: 'Invalid Course Mapping Id'});
+        }
+
+        const questionSets = await questionSetModel.find({courseMapping: mappingId});
+
+        return res.status(200).json({
+            message: "Question Set for the Given Mapping is fetched",
+            questionSets
+        });
+    } catch (error) {
+        console.log("Faculty Controller(listQuestionSetOfCourseMapping)");
+        console.log(error);
+        return res.status(500).json({message: "Something went wrong"});
+    }
+}
+
 module.exports = {
     studentRegister,
     studentLogin,
     studentCredentialsUpdate,
     getLoggedStudentDetails,
-    listOfEnrolledCourses
+    listOfEnrolledCourses,
+    listQuestionSetOfCourseMapping
 };

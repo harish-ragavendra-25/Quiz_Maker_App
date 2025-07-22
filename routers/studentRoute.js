@@ -7,7 +7,8 @@ const verifyStudent = require('../middleware/verifyStudent');
 const {
     studentCredentialsUpdate, 
     getLoggedStudentDetails,
-    listOfEnrolledCourses
+    listOfEnrolledCourses,
+    listQuestionSetOfCourseMapping
 } = require('../controllers/studentController');
 
 // Update-credentials
@@ -18,5 +19,8 @@ router.get('/get-details',verifyToken,verifyStudent,getLoggedStudentDetails);
 
 // Get List Of Enrolled Courses
 router.get('/get-list-of-enrolled-courses',verifyToken,verifyStudent,listOfEnrolledCourses);
+
+// Get Question Sets for Particular Mapping
+router.get('/get-question-sets/:mappingId',verifyToken,verifyStudent,listQuestionSetOfCourseMapping);
 
 module.exports = router;
