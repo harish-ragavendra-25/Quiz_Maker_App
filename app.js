@@ -13,6 +13,9 @@ const adminRoute = require('./routers/adminRoute');
 const facultyRoute = require('./routers/facultyRoute');
 const studentRoute = require('./routers/studentRoute');
 
+const autoExpireTestSessions = require('./cronJobs/autoExpireTestSessions');
+autoExpireTestSessions();
+
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cors());
