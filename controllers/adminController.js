@@ -170,7 +170,10 @@ const addFaculty = async(req,res) => {
         const newFaculty = new facultyModel({ userName,password,dept,name });
         await newFaculty.save();
 
-        return res.status(201).json({message: `Faculty ${userName} Created Successfully...`,faculty: newFaculty});
+        const responseFaculty = newFaculty.toObject();
+        delete responseFaculty.password;
+
+        return res.status(201).json({message: `Faculty ${userName} Created Successfully...`,faculty: responseFaculty});
     } catch (error) {
         console.log("Faculty creation error(Admin controller -> Add Faculty Function)");
         console.log(error);
@@ -197,7 +200,11 @@ const addStudent = async(req,res) => {
 
         const newStudent = new studentModel({ userName,password,name,dept });
         await newStudent.save();
-        return res.status(201).json({message: `Student ${userName} created Sucessfully`,student: newStudent});
+
+        const responseStudent = newStudent.toObject();
+        delete responseStudent.password;
+
+        return res.status(201).json({message: `Student ${userName} created Sucessfully`,student: responseStudent});
     } catch (error) {
         console.log("Student Creation function (Admin Controller -> addStudent)");
         console.log(error);

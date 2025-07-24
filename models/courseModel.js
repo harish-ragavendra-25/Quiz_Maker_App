@@ -3,26 +3,26 @@ const mongoose = require("mongoose");
 const courseSchema = new mongoose.Schema({
   courseCode: {
     type: String,
-    require: true
+    required: true
   },
   courseName: {
     type: String,
-    require: true,
+    required: true,
   },
   courseCategory:{
     type: String,
     enum: ['AIDS','CSE','IT','IOT','ECE','E&I','TRAINING','MECH','CIVIL','BIO MEDICAL'],
-    require: true
+    required: true
   },
   status:{
     type: String,
     enum: ['active','inactive'],
-    require: true,
+    required: true,
     default: 'active'
   },
   description: {
     type: String,
-    require: true
+    required: true
   }
 });
 

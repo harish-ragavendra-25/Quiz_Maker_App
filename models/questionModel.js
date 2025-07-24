@@ -8,12 +8,12 @@ const questionSchema = new mongoose.Schema({
   options: [
     {
       type: String,
-      require: true,
+      required: true,
     },
   ],
   correctAnswer: {
     type: String,
-    require: true,
+    required: true,
   },
   mark: {
     type: Number,

@@ -4,35 +4,40 @@ const testSessionSchema = new mongoose.Schema({
   student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "studentModel",
-    require: true,
+    required: true,
   },
   faculty: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "facultyModel",
-    require: true,
+    required: true,
   },
   courseMapping: {
     type: mongoose.Schema.Types.ObjectId,
     ref:'courseMappingModel',
-    require: true
+    required: true
   },
   questionSet:{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'questionSetModel',
-    require: true
+    required: true
   },
   answer: [{
         question: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'questionModel',
-            require: true
+            required: true
         },
         selectedOption: String,
         isCorrect: Boolean
   }],
   startedAt:{
     type: Date,
-    default: Date.now
+    default: Date.now,
+    required: true
+  },
+  endTime: {
+    type: Date,
+    required: true
   },
   submittedAt:{
     type: Date

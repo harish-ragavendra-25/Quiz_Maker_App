@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 const questionSetSchema = new mongoose.Schema({
   label: {
     type: String,
-    require: true,
+    required: true,
   },
   courseMapping: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "courseMappingModel",
-    require: true,
+    required: true,
   },
   questions: [
     {
@@ -18,7 +18,8 @@ const questionSetSchema = new mongoose.Schema({
   ],
   createdBy:{
     type:mongoose.Schema.Types.ObjectId,
-    ref:'facultyModel'
+    ref:'facultyModel',
+    required: true
   },
   isActive: {
     type: Boolean,
@@ -26,14 +27,14 @@ const questionSetSchema = new mongoose.Schema({
   },
   durationOfTest: {
     type: Number,
+    required: true
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
   DueDate: {
-    type: Date,
-    default: () => new Date(Date.now() + 24*60*60*1000)
+    type: Date
   },
   attemptsAllowed: {
     type: Number,

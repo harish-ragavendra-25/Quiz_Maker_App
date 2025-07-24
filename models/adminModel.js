@@ -7,12 +7,12 @@ const saltNum = parseInt(process.env.saltNum);
 const adminSchema = new mongoose.Schema({
     userName: {
         type: String,
-        require: true,
+        required: true,
         unique: true
     },
     password: {
         type: String,
-        require: true
+        required: true
     },
     role: {
         type: String,

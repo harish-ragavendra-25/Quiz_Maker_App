@@ -3,18 +3,18 @@ const courseMappingSchema = new mongoose.Schema({
   faculty: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "facultyModel",
-    require: true,
+    required: true,
   },
   course: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "courseModel",
-    require: true,
+    required: true,
   },
   student: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "studentModel",
-      require: true,
+      required: true,
     },
   ],
   questionSets: [
