@@ -385,6 +385,42 @@ const submitTestSession = async(req,res) => {
     }
 }
 
+const listAllSessionsOfMappings = async(req,res) => {
+    try {
+        const logged_student_id = req.user.id;
+        const { courseMappingId } = req.params;
+        
+        const mapping = await courseMappingModel.findById(courseMappingId);
+        if(!mapping){
+            return res.status(404).json({message: 'Mapping not found'});
+        }
+
+        const testSessions = await testSessionModel.find({
+            student: logged_student_id,
+            courseMapping: courseMappingId,
+            status: 'completed'
+        })
+        .populate({
+            path: 'questionSet',
+            select: 'label durationOfTest'
+        })
+        .populate({
+            path: 'answer.question',
+            select: 'questionText options correctAnswer mark'
+        })
+        .sort({submittedAt: -1});
+
+        return res.status(200).json({
+            message: "Test Session Reviews Fetched Successfully",
+            testAttempts: testSessions
+        });
+    } catch (error) {
+        console.log("Student Controller(listAllSessionsOfMappings)");
+        console.log(error);
+        return res.status(500).json({message: 'Something went wrong'});
+    }
+}
+
 module.exports = {
     studentRegister,
     studentLogin,
@@ -394,5 +430,6 @@ module.exports = {
     listQuestionSetOfCourseMapping,
     createTestSession,
     updateAnswerTestSession,
-    submitTestSession
+    submitTestSession,
+    listAllSessionsOfMappings
 };
