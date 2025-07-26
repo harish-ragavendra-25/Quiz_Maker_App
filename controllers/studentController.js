@@ -354,6 +354,37 @@ const updateAnswerTestSession = async(req,res) => {
     }
 }
 
+const submitTestSession = async(req,res) => {
+    try {
+        const { testSessionId } = req.params;
+        const session = await testSessionModel.findById(testSessionId);
+        if(!session){
+            return res.status(404).json({message: "Test Session Not Found"});
+        }
+
+        if(session.status === 'completed'){
+            return res.status(400).json({message: "Test Session Already Completed"});
+        }
+
+        session.status = 'completed';
+        session.submittedAt = new Date();
+        session.durationTaken = Math.floor((session.submittedAt - session.startedAt)/60000);
+
+        await session.save();
+        return res.status(200).json({
+            message: "Test Session submitted Successfully",
+            score: session.score,
+            durationTaken: session.durationTaken,
+            submittedAt: session.submittedAt,
+            testSession: session
+        });
+    } catch (error) {
+        console.log("Student Controller (SubmitTestSession)");
+        console.log(error);
+        return res.status(500).json({message: 'Something went wrong'});
+    }
+}
+
 module.exports = {
     studentRegister,
     studentLogin,
@@ -362,5 +393,6 @@ module.exports = {
     listOfEnrolledCourses,
     listQuestionSetOfCourseMapping,
     createTestSession,
-    updateAnswerTestSession
+    updateAnswerTestSession,
+    submitTestSession
 };
