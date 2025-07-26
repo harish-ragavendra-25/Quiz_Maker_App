@@ -21,7 +21,8 @@ const testSessionSchema = new mongoose.Schema({
     ref: 'questionSetModel',
     required: true
   },
-  answer: [{
+  answer: [
+    {
         question: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'questionModel',
@@ -29,7 +30,8 @@ const testSessionSchema = new mongoose.Schema({
         },
         selectedOption: String,
         isCorrect: Boolean
-  }],
+    }
+  ],
   startedAt:{
     type: Date,
     default: Date.now,

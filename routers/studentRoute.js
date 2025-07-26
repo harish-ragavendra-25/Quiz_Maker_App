@@ -9,7 +9,8 @@ const {
     getLoggedStudentDetails,
     listOfEnrolledCourses,
     listQuestionSetOfCourseMapping,
-    createTestSession
+    createTestSession,
+    updateAnswerTestSession
 } = require('../controllers/studentController');
 
 // Update-credentials
@@ -26,5 +27,8 @@ router.get('/get-question-sets/:mappingId',verifyToken,verifyStudent,listQuestio
 
 // Create Test Session
 router.post('/take-test',verifyToken,verifyStudent,createTestSession);
+
+// Update Answer Test Session
+router.put('/take-test/:testSessionId',verifyToken,verifyStudent,updateAnswerTestSession);
 
 module.exports = router;

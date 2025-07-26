@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const questionModel = require('../models/questionModel');
 const questionSetModel = require('../models/questionSetModel');
-const { default: mongoose } = require('mongoose');
 const testSessionModel = require('../models/testSessionModel');
 const courseMappingModel = require('../models/courseMappingModel');
 
@@ -257,11 +257,11 @@ const createTestSession = async(req,res) => {
         });
 
         if(questionSet.attemptsAllowed <= completedAttempts){
-            return nes.status(403).json({message: `Max attempts of ${questionSet.attemptsAllowed} reached for ${questionSet.label}`});
+            return res.status(403).json({message: `Max attempts of ${questionSet.attemptsAllowed} reached for ${questionSet.label}`});
         }
 
         const startedAt = new Date();
-        const endTime = new Date(startedAt.getTime() + questionSet.durationOfTest * 60000);
+        const endTime = new Date(startedAt.getTime() + questionSet.durationOfTest * 1000);
         
         // create a test session
         const newTestSession = new testSessionModel({
@@ -287,6 +287,73 @@ const createTestSession = async(req,res) => {
     }
 } 
 
+const updateAnswerTestSession = async(req,res) => {
+    try {
+        const { testSessionId } = req.params;
+        const { questionId,selectedOption } = req.body;
+
+        if(!testSessionId||!questionId||!selectedOption){
+            return res.status(400).json({message: 'missing fields'});
+        }
+
+        const testSession = await testSessionModel.findById(testSessionId);
+        if(!testSession){
+            return res.status(404).json({message: 'TestSession not found'});
+        }
+
+        if(testSession.status !== "pending"){
+            return res.status(403).json({message: "Test Session is Already Closed"});
+        }
+
+        const question = await questionModel.findById(questionId);
+        if(!question){
+            return res.status(404).json({message: "Question not found"});
+        }
+
+        const isCorrect = selectedOption === question.correctAnswer;
+
+        const existingAnswerIndex = testSession.answer.findIndex(
+            a => a.question.toString() === questionId
+        );
+
+        if(existingAnswerIndex !== -1){
+            const oldAns = testSession.answer[existingAnswerIndex];
+            if(oldAns.isCorrect){
+                testSession.score -= question.mark;
+            }
+            testSession.answer[existingAnswerIndex] = {
+                question: questionId,
+                selectedOption,
+                isCorrect
+            };
+        }
+        else{
+            testSession.answer.push(
+                {
+                    question: questionId,
+                    selectedOption,
+                    isCorrect
+                }
+            );
+        }
+
+        if(isCorrect){
+            testSession.score += question.mark;
+        }
+
+        await testSession.save();
+
+        return res.status(200).json({
+            message: "answer updated",
+            testSession
+        })
+    } catch (error) {
+        console.log("Student Controller (updateAnswerTestSession)");
+        console.log(error);
+        return res.status(500).json({message: 'Something went wrong'});
+    }
+}
+
 module.exports = {
     studentRegister,
     studentLogin,
@@ -294,5 +361,6 @@ module.exports = {
     getLoggedStudentDetails,
     listOfEnrolledCourses,
     listQuestionSetOfCourseMapping,
-    createTestSession
+    createTestSession,
+    updateAnswerTestSession
 };
