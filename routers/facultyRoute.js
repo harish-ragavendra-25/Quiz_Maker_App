@@ -13,7 +13,8 @@ const {
     createQuestionSet,
     addListOfQuestionToQuestionSet,
     editQuestion,
-    deleteQuestion
+    deleteQuestion,
+    viewStudentTestSession
  } = require('../controllers/facultyController');
 
 // Updation Of Credentials
@@ -42,5 +43,8 @@ router.put('/edit-question/:questionId',verifyToken,verifyFaculty,editQuestion);
 
 // Delete Question
 router.delete('/delete-question/:questionId',verifyToken,verifyFaculty,deleteQuestion);
+
+// Fetch Student Test Sessions
+router.get('/faculty-fetch-student-test-sessions',verifyToken,verifyFaculty,viewStudentTestSession);
 
 module.exports = router;

@@ -7,6 +7,7 @@ const studentModel = require('../models/studentModel');
 const courseMappingModel = require('../models/courseMappingModel');
 const questionSetModel = require('../models/questionSetModel');
 const questionModel = require('../models/questionModel');
+const testSessionModel = require('../models/testSessionModel');
 
 const facultyRegister = async(req,res) => {
     try {
@@ -181,6 +182,9 @@ const listStudentsOfCourseMapping = async(req,res) => {
         if(!mapping){
             return res.status(404).json({message: "Mapping not found"});
         }
+        if(mapping.faculty === req.user.id){
+            return res.status(401).json({message: 'Unauthorized Visit'});
+        }
 
         return res.status(200).json({
             message: "List Of Students Fetched Successfully",
@@ -202,6 +206,9 @@ const listQuestionSetsOfCourseMapping = async(req,res) => {
         const mapping = await courseMappingModel.findById(mappingId).populate('questionSets');
         if(!mapping){
             return res.status(404).json({message: "Course Mapping not found"});
+        }
+        if(mapping.faculty === req.user.id){
+            return res.status(401).json({message: 'Unauthorized Visit'});
         }
         
         return res.status(200).json({
@@ -235,6 +242,9 @@ const createQuestionSet = async(req,res) => {
         const mapping = await courseMappingModel.findById(courseMappingId);
         if(!mapping){
             return res.status(404).json({message: "Course Mapping not found"});
+        }
+        if(mapping.faculty === logged_faculty_id){
+            return res.status(401).json({message: 'Unauthorized Visit'});
         }
 
         // Creation of new Question Set
@@ -341,6 +351,44 @@ const deleteQuestion = async(req,res) => {
     }
 }
 
+const viewStudentTestSession = async(req,res) => {
+    try {
+        const { courseMappingId,studentId } = req.body;
+        const logged_faculty_id = req.user.id;
+
+        const mapping = await courseMappingModel.findOne(
+            {
+            _id: courseMappingId,
+            faculty: logged_faculty_id,
+            }
+        );
+        if(!mapping){
+            return res.status(403).json({message: "Unauthorized: Not Your Course Mapping"});
+        }
+        if(!mapping.student.includes(studentId)){
+            return res.status(400).json({message: "Student not enrolled in the particular course"});
+        }
+
+        const session = await testSessionModel.find({
+            courseMapping: courseMappingId,
+            student: studentId,
+            faculty: logged_faculty_id
+        })
+        .populate('questionSet','label durationOfTest')
+        .populate('answer.question','questionText options correctAnswer')
+        .populate('student','userName name dept');
+
+        return res.status(200).json({
+            message: "Test Sessions For Student Fetched Successfully",
+            session
+        });
+    } catch (error) {
+        console.log("Faculty Controller (viewStudentTestSession)");
+        console.log(error);
+        return res.status(500).json({message: 'Something went wrong'});
+    }
+}
+
 module.exports = {
     facultyRegister,
     facultyLogin,
@@ -352,5 +400,6 @@ module.exports = {
     createQuestionSet,
     addListOfQuestionToQuestionSet,
     editQuestion,
-    deleteQuestion
+    deleteQuestion,
+    viewStudentTestSession
 };
