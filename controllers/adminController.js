@@ -440,6 +440,43 @@ const deleteFaculty = async(req,res) => {
     }
 }
 
+const toggleBlockFaculty = async(req,res) => {
+    try {
+        const { facultyId } = req.params;
+
+        const faculty = await facultyModel.findById(facultyId);
+        if(!faculty){
+            return res.status(400).json({message: "Faculty not found"});
+        }
+        faculty.isBlocked = !faculty.isBlocked;
+        await faculty.save();
+        const statusMsg = faculty.isBlocked ? 'Blocked' : 'Un-Blocked';
+        return res.status(200).json({message: `${faculty.name} ${statusMsg} successfully`});
+    } catch (error) {
+        console.log("Admin Controller (toggleBlockFaculty) ");
+        console.log(error);
+        return res.status(500).json({message: "Something went wrong"});
+    }
+}
+
+const toggleBlockStudent = async(req,res) => {
+    try {
+        const { studentId } = req.params;
+        const student = await studentModel.findById(studentId);
+        if(!student){
+            return res.status(400).json({message: "Student not found"});
+        }
+        student.isBlocked = !student.isBlocked;
+        await student.save();
+        const statusMsg = student.isBlocked ? 'Blocked' : 'Un-Blocked';
+        return res.status(200).json({message: `${student.name} is ${statusMsg} successfully`});
+    } catch (error) {
+        console.log("Admin Controller (toggleBlockStudent)");
+        console.log(error);
+        return res.status(500).json({message: "Something went wrong"});
+    }
+}
+
 module.exports = {
     adminRegister,
     adminLogin,
@@ -455,5 +492,7 @@ module.exports = {
     mapFacultyToCourse,
     mapStudentIdsToCourseId,
     deleteStudent,
-    deleteFaculty
+    deleteFaculty,
+    toggleBlockFaculty,
+    toggleBlockStudent
 };

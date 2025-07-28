@@ -17,7 +17,9 @@ const {
     deleteStudent, 
     adminUpdationOfFacultyDetails, 
     adminUpdationOfStudentDetails,
-    deleteFaculty
+    deleteFaculty,
+    toggleBlockFaculty,
+    toggleBlockStudent
 } = require('../controllers/adminController');
 
 // updation credentials
@@ -58,5 +60,11 @@ router.post('/delete-student',verifyToken,verifyAdmin,deleteStudent);
 
 // Delete Faculty from FacultyModel and Faculty-course Mapping
 router.post('/delete-faculty',verifyToken,verifyAdmin,deleteFaculty);
+
+// Toggle Block Faculty
+router.put('/toggle-active-faculty/:facultyId',verifyToken,verifyAdmin,toggleBlockFaculty);
+
+// Toggle Block Student
+router.put('/toggle-activity-student/:studentId',verifyToken,verifyAdmin,toggleBlockStudent);
 
 module.exports = router;
