@@ -421,6 +421,36 @@ const listAllSessionsOfMappings = async(req,res) => {
     }
 }
 
+const listTestSessionOnId = async(req,res) => {
+    try {
+        const { testSessionId } = req.params;
+        const logged_student_id = req.user.id;
+
+        const testSession = await testSessionModel.findOne({
+            _id: testSessionId,
+            student: logged_student_id
+        })
+        .populate('questionSet','label durationOfTest')
+        .populate({
+            path: 'answer.question',
+            select: 'questionText options correctAnswer mark'
+        });
+
+        if(!testSession){
+            return res.status(404).json({message: "Test Session not found"});
+        }
+
+        return res.status(200).json({
+            messgae: "Test Session Fetched Successfully",
+            testSession
+        })
+    } catch (error) {
+        console.log("student controller (listTestSessionOnId)");
+        console.log(error);
+        return res.status(500).json({message: "Something went wrong"});
+    }
+}
+
 module.exports = {
     studentRegister,
     studentLogin,
@@ -431,5 +461,6 @@ module.exports = {
     createTestSession,
     updateAnswerTestSession,
     submitTestSession,
-    listAllSessionsOfMappings
+    listAllSessionsOfMappings,
+    listTestSessionOnId
 };
