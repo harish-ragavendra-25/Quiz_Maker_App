@@ -389,6 +389,31 @@ const viewStudentTestSession = async(req,res) => {
     }
 }
 
+const toggleActivationQuestionSet = async(req,res) => {
+    try {
+        const { questionSetId } = req.params;
+        const logged_faculty_id = req.user.id;
+
+        const questionSet = await questionSetModel.findById(questionSetId);
+        if(!questionSet){
+            return res.status(404).json({message: "Question Set not found"});
+        }
+
+        if(questionSet.createdBy.toString() !== logged_faculty_id.toString()){
+            return res.status(403).json({message: "UnAuthorized: You are not the creator of the question set"});
+        }
+
+        questionSet.isActive = !questionSet.isActive;
+        await questionSet.save();
+        const status = questionSet.isActive ? "Activated" : "De-activated";
+        return res.status(200).json({message: `${questionSet.label} - ${status}`});
+    } catch (error) {
+        console.log("Faculty Controller (toggleActivationQuestionSet)");
+        console.log(error);
+        return res.status(500).json({message: 'Something went wrong'});
+    }
+}
+
 module.exports = {
     facultyRegister,
     facultyLogin,
@@ -401,5 +426,6 @@ module.exports = {
     addListOfQuestionToQuestionSet,
     editQuestion,
     deleteQuestion,
-    viewStudentTestSession
+    viewStudentTestSession,
+    toggleActivationQuestionSet
 };

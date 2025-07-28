@@ -14,7 +14,8 @@ const {
     addListOfQuestionToQuestionSet,
     editQuestion,
     deleteQuestion,
-    viewStudentTestSession
+    viewStudentTestSession,
+    toggleActivationQuestionSet
  } = require('../controllers/facultyController');
 
 // Updation Of Credentials
@@ -46,5 +47,8 @@ router.delete('/delete-question/:questionId',verifyToken,verifyFaculty,deleteQue
 
 // Fetch Student Test Sessions
 router.get('/faculty-fetch-student-test-sessions',verifyToken,verifyFaculty,viewStudentTestSession);
+
+// Toggle Activation Of Question Set
+router.put('/toggle-activation-question-set/:questionSetId',verifyToken,verifyFaculty,toggleActivationQuestionSet);
 
 module.exports = router;
